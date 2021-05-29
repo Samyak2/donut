@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"math"
+	"os"
 	"time"
 )
 
@@ -10,14 +12,17 @@ const height = 40
 const width = 40
 const depth = 10
 
-const framerateX = 30
-const stepX = 10.0 * math.Pi / 180.0
-const framerateZ = 10
-const stepZ = 10.0 * math.Pi / 180.0
+// const framerateX = 30
+const startX = 0.0 * math.Pi / 180.0
+const stepX = 2.0 * math.Pi / 180.0
+// const framerateZ = 10
+const startZ = 60.0 * math.Pi / 180.0
+const stepZ = 360 * math.Pi / 180.0
 
-const framedelay = 32
+const framedelay = 16
 
-const resolution = 100
+const resolutionPhi = 180
+const resolutionTheta = 90
 
 // R1
 const radius = 1.0
@@ -47,17 +52,18 @@ func resetZBuffer(zBuffer [][][2]int) {
 	}
 }
 
-func drawScreen(zBuffer [][][2]int) {
-	fmt.Print("\033[2J\033[H")
+func drawScreen(f *bufio.Writer, zBuffer [][][2]int) {
+	defer f.Flush()
+	f.WriteString("\033[2J\033[H")
 	for i := 0; i < len(zBuffer); i++ {
 		for j := 0; j < len(zBuffer[i]); j++ {
 			if zBuffer[i][j][0] == math.MaxInt64 {
-				fmt.Print(" ")
+				f.WriteString(" ")
 			} else {
-				fmt.Printf("%c", charMap[zBuffer[i][j][1]])
+				f.WriteString(fmt.Sprintf("%c", charMap[zBuffer[i][j][1]]))
 			}
 		}
-		fmt.Println()
+		f.WriteString("\n")
 	}
 }
 
@@ -65,13 +71,13 @@ func main() {
 	theta := 0.0
 	phi := 0.0
 
-	maxX := 0.0
-	maxY := 0.0
-	maxZ := 0.0
+	// maxX := 0.0
+	// maxY := 0.0
+	// maxZ := 0.0
 
-	minX := 0.0
-	minY := 0.0
-	minZ := 0.0
+	// minX := 0.0
+	// minY := 0.0
+	// minZ := 0.0
 
 	zBuffer := make([][][2]int, height)
 	for i := 0; i < height; i++ {
@@ -82,14 +88,18 @@ func main() {
 	}
 	resetZBuffer(zBuffer)
 
+	f := bufio.NewWriter(os.Stdout)
+
+	fmt.Print("\033[?25l")
+
 	// fmt.Println(cameraDist)
 
-	for A := 0.0; A < 2.0 * math.Pi; A += stepX {
+	for A := startX; A < 2.0 * math.Pi; A += stepX {
 		// A := (float64(a) / framerateX) * (1.0 * math.Pi)
 		cosA := math.Cos(A)
 		sinA := math.Sin(A)
 
-		for B := 0.0; B < 2.0 * math.Pi; B += stepZ {
+		for B := startZ; B < 2.0 * math.Pi; B += stepZ {
 			// B := (float64(b) / framerateZ) * (2.0 * math.Pi)
 			cosB := math.Cos(B)
 			sinB := math.Sin(B)
@@ -97,14 +107,14 @@ func main() {
 			resetZBuffer(zBuffer)
 
 			// outer loop for phi
-			for i := 0; i < resolution; i++ {
-				phi = (float64(i) / resolution) * (2.0 * math.Pi)
+			for i := 0; i < resolutionPhi; i++ {
+				phi = (float64(i) / resolutionPhi) * (2.0 * math.Pi)
 				cosΦ := math.Cos(phi)
 				sinΦ := math.Sin(phi)
 
 				// inner loop for theta
-				for j := 0; j < resolution; j++ {
-					theta = (float64(j) / resolution) * (2.0 * math.Pi)
+				for j := 0; j < resolutionTheta; j++ {
+					theta = (float64(j) / resolutionTheta) * (2.0 * math.Pi)
 					cosθ := math.Cos(theta)
 					sinθ := math.Sin(theta)
 
@@ -147,16 +157,16 @@ func main() {
 						}
 					}
 
-					maxX = math.Max(maxX, x)
-					maxY = math.Max(maxY, y)
-					maxZ = math.Max(maxZ, z)
+					// maxX = math.Max(maxX, x)
+					// maxY = math.Max(maxY, y)
+					// maxZ = math.Max(maxZ, z)
 
-					minX = math.Min(minX, x)
-					minY = math.Min(minY, y)
-					minZ = math.Min(minZ, z)
+					// minX = math.Min(minX, x)
+					// minY = math.Min(minY, y)
+					// minZ = math.Min(minZ, z)
 				}
 			}
-			drawScreen(zBuffer)
+			drawScreen(f, zBuffer)
 			time.Sleep(time.Millisecond * framedelay)
 		}
 	}
@@ -165,5 +175,6 @@ func main() {
 	// fmt.Println(1/maxX, 1/maxY, 1/maxZ)
 	// fmt.Println(minX, minY, minZ)
 	// fmt.Println(1/minX, 1/minY, 1/minZ)
+	fmt.Print("\033[?25h")
 
 }
