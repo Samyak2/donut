@@ -6,27 +6,30 @@ import (
 	"time"
 )
 
-const height = 30
-const width = 30
+const height = 40
+const width = 40
 const depth = 10
 
 const framerateX = 30
+const stepX = 10.0 * math.Pi / 180.0
 const framerateZ = 10
-const framedelay = 100
+const stepZ = 10.0 * math.Pi / 180.0
+
+const framedelay = 32
 
 const resolution = 100
 
 // R1
-const radius = 5
+const radius = 1.0
 
 // R2
-const offset = 5
-
-// K_1
-const cameraDist = 10
+const offset = 2.0
 
 // K_2
-const donutDist = 15
+const donutDist = 5.0
+
+// K_1
+const cameraDist = width * donutDist * 3 / (8 * (radius + offset))
 
 const charMap = ".,-~:;=!*#$@"
 
@@ -79,13 +82,15 @@ func main() {
 	}
 	resetZBuffer(zBuffer)
 
-	for a := 0; a < framerateX; a++ {
-		A := (float64(a) / framerateX) * (2.0 * math.Pi)
+	// fmt.Println(cameraDist)
+
+	for A := 0.0; A < 2.0 * math.Pi; A += stepX {
+		// A := (float64(a) / framerateX) * (1.0 * math.Pi)
 		cosA := math.Cos(A)
 		sinA := math.Sin(A)
 
-		for b := 0; b < framerateZ; b++ {
-			B := (float64(b) / framerateZ) * (2.0 * math.Pi)
+		for B := 0.0; B < 2.0 * math.Pi; B += stepZ {
+			// B := (float64(b) / framerateZ) * (2.0 * math.Pi)
 			cosB := math.Cos(B)
 			sinB := math.Sin(B)
 
@@ -111,10 +116,10 @@ func main() {
 						circleY*cosA*sinB
 					oldY := circleX*(cosΦ*sinB-cosB*sinA*sinΦ) +
 						circleY*cosA*cosB
-					oldZ := (circleX)*cosA*sinΦ + circleY*sinA
+					oldZ := donutDist + (circleX)*cosA*sinΦ + circleY*sinA
 
-					x := ((cameraDist * oldX) / (donutDist + oldZ)) + height/2
-					y := ((cameraDist * oldY) / (donutDist + oldZ)) + width/2
+					x := width/2 + ((cameraDist * oldX) / (oldZ))
+					y := height/2 - ((cameraDist * oldY) / (oldZ))
 					z := oldZ
 
 					// fmt.Println(x, y, z)
@@ -125,20 +130,21 @@ func main() {
 
 					if rZ < zBuffer[rX][rY][0] {
 						// luminance
-						oldL := math.Cos(phi)*math.Cos(theta)*math.Sin(B) -
-							math.Cos(A)*math.Cos(theta)*math.Sin(phi) -
-							math.Sin(A)*math.Sin(theta) +
-							math.Cos(B)*(math.Cos(A)*math.Sin(theta)-
-								math.Cos(theta)*math.Sin(A)*math.Sin(phi))
+						oldL := cosΦ*cosθ*sinB -
+							cosA*cosθ*sinΦ -
+							sinA*sinθ +
+							cosB*(cosA*sinθ-
+								cosθ*sinA*sinΦ)
 
-						oldL += 1.5
-						oldL *= 3
+						if oldL > 0 {
+							// fmt.Println(oldL)
+							l := int(math.Round(oldL * 8))
+							// fmt.Println(l)
 
-						// fmt.Println(oldL)
-						l := int(math.Round(oldL))
-						// fmt.Println(l)
-
-						zBuffer[rX][rY] = [2]int{rZ, l}
+							zBuffer[rX][rY] = [2]int{rZ, l}
+						} else {
+							zBuffer[rX][rY] = [2]int{rZ, 0}
+						}
 					}
 
 					maxX = math.Max(maxX, x)
