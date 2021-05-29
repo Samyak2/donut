@@ -28,28 +28,30 @@ const cameraDist = 10
 // K_2
 const donutDist = 15
 
+const charMap = ".,-~:;=!*#$@"
+
 // angle X
 // const A = 0.5
 
 // angle Z
 // const B = 0.5
 
-func resetZBuffer(zBuffer [][]int) {
+func resetZBuffer(zBuffer [][][2]int) {
 	for i := 0; i < height; i++ {
 		for j := 0; j < width; j++ {
-			zBuffer[i][j] = math.MaxInt64
+			zBuffer[i][j] = [2]int{math.MaxInt64, 0}
 		}
 	}
 }
 
-func drawScreen(zBuffer [][]int) {
+func drawScreen(zBuffer [][][2]int) {
 	fmt.Print("\033[2J\033[H")
 	for i := 0; i < len(zBuffer); i++ {
 		for j := 0; j < len(zBuffer[i]); j++ {
-			if zBuffer[i][j] == math.MaxInt64 {
+			if zBuffer[i][j][0] == math.MaxInt64 {
 				fmt.Print(" ")
 			} else {
-				fmt.Print("•")
+				fmt.Printf("%c", charMap[zBuffer[i][j][1]])
 			}
 		}
 		fmt.Println()
@@ -68,9 +70,9 @@ func main() {
 	minY := 0.0
 	minZ := 0.0
 
-	zBuffer := make([][]int, height)
+	zBuffer := make([][][2]int, height)
 	for i := 0; i < height; i++ {
-		zBuffer[i] = make([]int, width)
+		zBuffer[i] = make([][2]int, width)
 		// for j := 0; j < width; j++ {
 		// 	zBuffer[i][j] = make([]float64, depth)
 		// }
@@ -114,8 +116,22 @@ func main() {
 					rY := int(math.Round(y))
 					rZ := int(math.Round(z))
 
-					if rZ < zBuffer[rX][rY] {
-						zBuffer[rX][rY] = rZ
+					if rZ < zBuffer[rX][rY][0] {
+						// luminance
+						oldL := math.Cos(phi)*math.Cos(theta)*math.Sin(B) -
+							math.Cos(A)*math.Cos(theta)*math.Sin(phi) -
+							math.Sin(A)*math.Sin(theta) +
+							math.Cos(B)*(math.Cos(A)*math.Sin(theta)-
+								math.Cos(theta)*math.Sin(A)*math.Sin(phi))
+
+						oldL += 1.5
+						oldL *= 3
+
+						// fmt.Println(oldL)
+						l := int(math.Round(oldL))
+						// fmt.Println(l)
+
+						zBuffer[rX][rY] = [2]int{rZ, l}
 					}
 
 					maxX = math.Max(maxX, x)
