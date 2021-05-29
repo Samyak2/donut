@@ -16,7 +16,7 @@ const depth = 10
 
 // const framerateX = 30
 const startX = 30.0 * math.Pi / 180.0
-const stepX = 2.0 * math.Pi / 180.0
+const stepX = 10.0 * math.Pi / 180.0
 
 // const framerateZ = 10
 const startZ = 60.0 * math.Pi / 180.0
@@ -104,13 +104,15 @@ func main() {
 	fmt.Print("\033[?25l")
 
 	// fmt.Println(cameraDist)
+	A := startX
+	B := startZ
 
-	for A := startX; A <= 2.0*math.Pi+stepX; A += stepX {
+	for ; A <= 2.0*math.Pi+stepX; A += stepX {
 		// A := (float64(a) / framerateX) * (1.0 * math.Pi)
 		cosA := math.Cos(A)
 		sinA := math.Sin(A)
 
-		for B := startZ; B <= 2.0*math.Pi+stepZ; B += stepZ {
+		for ; B <= 2.0*math.Pi+stepZ; B += stepZ {
 			// B := (float64(b) / framerateZ) * (2.0 * math.Pi)
 			cosB := math.Cos(B)
 			sinB := math.Sin(B)
@@ -184,8 +186,10 @@ func main() {
 			// }
 			// fmt.Println(A, B)
 		}
+		B -= 2.0 * math.Pi
 		// time.Sleep(time.Millisecond * 1000)
 	}
+	A -= 2.0 * math.Pi
 
 	// fmt.Println(maxX, maxY, maxZ)
 	// fmt.Println(1/maxX, 1/maxY, 1/maxZ)
