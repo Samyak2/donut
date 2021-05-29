@@ -81,30 +81,37 @@ func main() {
 
 	for a := 0; a < framerateX; a++ {
 		A := (float64(a) / framerateX) * (2.0 * math.Pi)
+		cosA := math.Cos(A)
+		sinA := math.Sin(A)
 
 		for b := 0; b < framerateZ; b++ {
 			B := (float64(b) / framerateZ) * (2.0 * math.Pi)
+			cosB := math.Cos(B)
+			sinB := math.Sin(B)
 
 			resetZBuffer(zBuffer)
 
 			// outer loop for phi
 			for i := 0; i < resolution; i++ {
 				phi = (float64(i) / resolution) * (2.0 * math.Pi)
+				cosΦ := math.Cos(phi)
+				sinΦ := math.Sin(phi)
+
 				// inner loop for theta
 				for j := 0; j < resolution; j++ {
 					theta = (float64(j) / resolution) * (2.0 * math.Pi)
+					cosθ := math.Cos(theta)
+					sinθ := math.Sin(theta)
+
+					circleX := offset + radius*cosθ
+					circleY := radius * sinθ
 
 					// pre-projection
-					oldX := (math.Cos(phi)*math.Cos(B)+
-						math.Sin(A)*math.Sin(B)*math.Sin(phi))*
-						(offset+radius*math.Cos(theta)) -
-						radius*math.Cos(A)*math.Sin(B)*math.Sin(theta)
-					oldY := (offset+radius*math.Cos(theta))*
-						(math.Cos(phi)*math.Sin(B)-
-							math.Cos(B)*math.Sin(A)*math.Sin(phi)) +
-						radius*math.Cos(A)*math.Cos(B)*math.Sin(theta)
-					oldZ := (offset+radius*math.Cos(theta))*math.Cos(A)*math.Sin(phi) +
-						radius*math.Sin(A)*math.Sin(theta)
+					oldX := (cosΦ*cosB+sinA*sinB*sinΦ)*circleX -
+						circleY*cosA*sinB
+					oldY := circleX*(cosΦ*sinB-cosB*sinA*sinΦ) +
+						circleY*cosA*cosB
+					oldZ := (circleX)*cosA*sinΦ + circleY*sinA
 
 					x := ((cameraDist * oldX) / (donutDist + oldZ)) + height/2
 					y := ((cameraDist * oldY) / (donutDist + oldZ)) + width/2
