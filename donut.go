@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -13,11 +15,12 @@ const width = 40
 const depth = 10
 
 // const framerateX = 30
-const startX = 0.0 * math.Pi / 180.0
+const startX = 30.0 * math.Pi / 180.0
 const stepX = 2.0 * math.Pi / 180.0
+
 // const framerateZ = 10
 const startZ = 60.0 * math.Pi / 180.0
-const stepZ = 360 * math.Pi / 180.0
+const stepZ = 5.0 * math.Pi / 180.0
 
 const framedelay = 16
 
@@ -68,6 +71,14 @@ func drawScreen(f *bufio.Writer, zBuffer [][][2]int) {
 }
 
 func main() {
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		fmt.Print("\033[?25h")
+		os.Exit(1)
+	}()
+
 	theta := 0.0
 	phi := 0.0
 
@@ -94,12 +105,12 @@ func main() {
 
 	// fmt.Println(cameraDist)
 
-	for A := startX; A < 2.0 * math.Pi; A += stepX {
+	for A := startX; A <= 2.0*math.Pi+stepX; A += stepX {
 		// A := (float64(a) / framerateX) * (1.0 * math.Pi)
 		cosA := math.Cos(A)
 		sinA := math.Sin(A)
 
-		for B := startZ; B < 2.0 * math.Pi; B += stepZ {
+		for B := startZ; B <= 2.0*math.Pi+stepZ; B += stepZ {
 			// B := (float64(b) / framerateZ) * (2.0 * math.Pi)
 			cosB := math.Cos(B)
 			sinB := math.Sin(B)
@@ -168,7 +179,12 @@ func main() {
 			}
 			drawScreen(f, zBuffer)
 			time.Sleep(time.Millisecond * framedelay)
+			// if B == startZ {
+			// 	time.Sleep(time.Millisecond * 1000)
+			// }
+			// fmt.Println(A, B)
 		}
+		// time.Sleep(time.Millisecond * 1000)
 	}
 
 	// fmt.Println(maxX, maxY, maxZ)
