@@ -11,16 +11,18 @@ import (
 	"time"
 )
 
+// these are actually interchanged lol
 const height = 40
-const width = 40
-const depth = 10
+const width = 25
+
+const depth = 11
 
 // const framerateX = 30
 const startX = 20.0 * math.Pi / 180.0
 const stepX = 1.0 * math.Pi / 180.0
 
 // const framerateZ = 10
-const startZ = 60.0 * math.Pi / 180.0
+const startZ = 30.0 * math.Pi / 180.0
 const stepZ = 360.0 * math.Pi / 180.0
 
 const framedelay = 16
@@ -39,6 +41,7 @@ const donutDist = 5.0
 
 // K_1
 const cameraDist = width * donutDist * 3 / (8 * (radius + offset))
+const cameraDistY = height * donutDist * 3 / (8 * (radius + offset))
 
 // const charMap = ".,▗_▁▂▃▄▅▆▇█"
 
@@ -49,8 +52,8 @@ const cameraDist = width * donutDist * 3 / (8 * (radius + offset))
 // const B = 0.5
 
 func resetZBuffer(zBuffer [][][2]int) {
-	for i := 0; i < height; i++ {
-		for j := 0; j < width; j++ {
+	for i := 0; i < width; i++ {
+		for j := 0; j < height; j++ {
 			zBuffer[i][j] = [2]int{math.MaxInt64, 0}
 		}
 	}
@@ -92,9 +95,9 @@ func main() {
 	// minY := 0.0
 	// minZ := 0.0
 
-	zBuffer := make([][][2]int, height)
-	for i := 0; i < height; i++ {
-		zBuffer[i] = make([][2]int, width)
+	zBuffer := make([][][2]int, width)
+	for i := 0; i < width; i++ {
+		zBuffer[i] = make([][2]int, height)
 		// for j := 0; j < width; j++ {
 		// 	zBuffer[i][j] = make([]float64, depth)
 		// }
@@ -144,7 +147,7 @@ func main() {
 					oldZ := donutDist + (circleX)*cosA*sinΦ + circleY*sinA
 
 					x := width/2 + ((cameraDist * oldX) / (oldZ))
-					y := height/2 - ((cameraDist * oldY) / (oldZ))
+					y := height/2 - ((cameraDistY * oldY) / (oldZ))
 					z := oldZ
 
 					// fmt.Println(x, y, z)
