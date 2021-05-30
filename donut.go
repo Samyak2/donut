@@ -12,10 +12,10 @@ import (
 )
 
 // these are actually interchanged lol
-const height = 40
-const width = 20
+const height = 80
+const width = 40
 
-const depth = 11
+// const depth = 11
 
 // const framerateX = 30
 const startX = 20.0 * math.Pi / 180.0
@@ -25,10 +25,11 @@ const stepX = 1.0 * math.Pi / 180.0
 const startZ = 30.0 * math.Pi / 180.0
 const stepZ = 360.0 * math.Pi / 180.0
 
-const framedelay = 16
+const framedelay = 32
 
-const resolutionPhi = 180
-const resolutionTheta = 90
+// lower res can cause black spots to appear
+const resolutionPhi = 250
+const resolutionTheta = 250
 
 // R1
 const radius = 1.0
@@ -152,9 +153,10 @@ func main() {
 
 					// fmt.Println(x, y, z)
 
-					rX := int(math.Round(x))
-					rY := int(math.Round(y))
-					rZ := int(math.Round(z))
+					// math.Round here does not bring much improvement
+					rX := int(x)
+					rY := int(y)
+					rZ := int(z)
 
 					if rZ < zBuffer[rX][rY][0] {
 						// luminance
@@ -166,7 +168,7 @@ func main() {
 
 						if oldL > 0 {
 							// fmt.Println(oldL)
-							l := int(math.Round(oldL * 8))
+							l := int(oldL * 8)
 							// fmt.Println(l)
 
 							zBuffer[rX][rY] = [2]int{rZ, l}
