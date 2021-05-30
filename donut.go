@@ -65,7 +65,7 @@ func resetZBuffer(zBuffer [][][2]int) {
 func drawScreen(f *bufio.Writer, zBuffer [][][2]int) {
 	defer f.Flush()
 
-	f.WriteString("\033[2J\033[H")
+	f.WriteString("\033[H")
 	for i := 0; i < len(zBuffer); i++ {
 		for j := 0; j < len(zBuffer[i]); j++ {
 			if zBuffer[i][j][0] == math.MaxInt64 {
