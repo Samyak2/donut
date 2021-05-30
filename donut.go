@@ -12,8 +12,8 @@ import (
 )
 
 // these are actually interchanged lol
-const height = 80
-const width = 40
+const height = 70
+const width = 35
 
 // const framerateX = 30
 const startX = 20.0 * math.Pi / 180.0
@@ -109,7 +109,8 @@ func main() {
 
 	f := bufio.NewWriter(os.Stdout)
 
-	fmt.Print("\033[?25l")
+	// clear screen and remove cursor
+	fmt.Print("\033[2J\033[?25l")
 
 	// fmt.Println(cameraDist)
 	A := startX
