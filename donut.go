@@ -44,7 +44,7 @@ const donutDist = 5.0
 const cameraDist = width * donutDist * 3 / (8 * (radius + offset))
 const cameraDistY = height * donutDist * 3 / (8 * (radius + offset))
 
-// const charMap = ".,▗_▁▂▃▄▅▆▇█"
+var charMap = []int{52, 53, 88, 89, 90, 91, 92, 93, 126, 127, 128, 129}
 
 // angle X
 // const A = 0.5
@@ -69,7 +69,7 @@ func drawScreen(f *bufio.Writer, zBuffer [][][2]int) {
 			if zBuffer[i][j][0] == math.MaxInt64 {
 				f.WriteString(" ")
 			} else {
-				f.WriteString(fmt.Sprintf("\u001b[38;5;%dm█\u001b[0m", 235 + zBuffer[i][j][1]))
+				f.WriteString(fmt.Sprintf("\u001b[38;5;%dm█", charMap[zBuffer[i][j][1]]))
 			}
 		}
 		f.WriteString("\n")
