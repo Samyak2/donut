@@ -13,7 +13,7 @@ import (
 
 // these are actually interchanged lol
 const height = 40
-const width = 25
+const width = 20
 
 const depth = 11
 
@@ -68,7 +68,7 @@ func drawScreen(f *bufio.Writer, zBuffer [][][2]int) {
 			if zBuffer[i][j][0] == math.MaxInt64 {
 				f.WriteString(" ")
 			} else {
-				f.WriteString(fmt.Sprintf("\u001b[38;5;%dm█\u001b[0m", 240 + zBuffer[i][j][1]))
+				f.WriteString(fmt.Sprintf("\u001b[38;5;%dm█\u001b[0m", 235 + zBuffer[i][j][1]))
 			}
 		}
 		f.WriteString("\n")
