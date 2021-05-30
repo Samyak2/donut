@@ -15,8 +15,6 @@ import (
 const height = 80
 const width = 40
 
-// const depth = 11
-
 // const framerateX = 30
 const startX = 20.0 * math.Pi / 180.0
 const stepX = 1.0 * math.Pi / 180.0
@@ -44,7 +42,11 @@ const donutDist = 5.0
 const cameraDist = width * donutDist * 3 / (8 * (radius + offset))
 const cameraDistY = height * donutDist * 3 / (8 * (radius + offset))
 
-var charMap = []int{52, 53, 88, 89, 90, 91, 92, 93, 126, 127, 128, 129}
+var charMapPink = []int{196, 197, 198, 199, 200, 201, 205, 206, 207, 218, 219, 224, 225}
+var charMapBW = []int{233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244}
+
+// select colors here
+var charMap = charMapBW
 
 // angle X
 // const A = 0.5
