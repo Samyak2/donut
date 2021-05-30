@@ -6,14 +6,23 @@ import (
 	"math"
 	"os"
 	"os/signal"
-	// "strconv"
 	"syscall"
 	"time"
 )
 
+// some basic configuration
+// TODO: expose these as flags
+const size = 40
+const aspectRatio = 1.75
+
+// select colors here
+var charMap = charMapBW
+// set only when charMap is charMapBW (otherwise 0)
+var brightness = 2
+
 // these are actually interchanged lol
-const height = 70
-const width = 35
+const height = size * aspectRatio
+const width = size
 
 // const framerateX = 30
 const startX = 20.0 * math.Pi / 180.0
@@ -26,8 +35,9 @@ const stepZ = 360.0 * math.Pi / 180.0
 const framedelay = 32
 
 // lower res can cause black spots to appear
-const resolutionPhi = 250
-const resolutionTheta = 250
+// 6 was decided arbitrarily
+const resolutionPhi = size * 6
+const resolutionTheta = size * 6
 
 // R1
 const radius = 1.0
@@ -46,14 +56,6 @@ var charMapPink = []int{196, 197, 198, 199, 200, 201, 205, 206, 207, 218, 219, 2
 var charMapBW = []int{233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244}
 var charMapBlue = []int{16, 17, 18, 19, 20, 21, 24, 25, 26, 27, 32, 33, 69}
 
-// select colors here
-var charMap = charMapBW
-
-// angle X
-// const A = 0.5
-
-// angle Z
-// const B = 0.5
 
 func resetZBuffer(zBuffer [][][2]int) {
 	for i := 0; i < width; i++ {
@@ -72,7 +74,7 @@ func drawScreen(f *bufio.Writer, zBuffer [][][2]int) {
 			if zBuffer[i][j][0] == math.MaxInt64 {
 				f.WriteString(" ")
 			} else {
-				f.WriteString(fmt.Sprintf("\u001b[38;5;%dm█", charMap[zBuffer[i][j][1]]))
+				f.WriteString(fmt.Sprintf("\u001b[38;5;%dm█", charMap[zBuffer[i][j][1]] + brightness))
 			}
 		}
 		f.WriteString("\n")
