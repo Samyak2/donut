@@ -44,6 +44,7 @@ const cameraDistY = height * donutDist * 3 / (8 * (radius + offset))
 
 var charMapPink = []int{196, 197, 198, 199, 200, 201, 205, 206, 207, 218, 219, 224, 225}
 var charMapBW = []int{233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244}
+var charMapBlue = []int{16, 17, 18, 19, 20, 21, 24, 25, 26, 27, 32, 33, 69}
 
 // select colors here
 var charMap = charMapBW
